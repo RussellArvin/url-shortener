@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@url-shortener/database";
 import { links } from "@url-shortener/database/schema";
 
@@ -10,7 +10,7 @@ redirectRoutes.get("/:slug", async (c) => {
   const [row] = await db
     .select({ targetUrl: links.targetUrl })
     .from(links)
-    .where(eq(links.slug, slug))
+    .where(and(eq(links.slug, slug), isNull(links.deletedAt)))
     .limit(1);
   if (!row) return c.notFound();
   return c.redirect(row.targetUrl, 302);

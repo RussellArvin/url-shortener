@@ -33,7 +33,18 @@ export function LinksPage() {
           Newest first. Click a short URL to test the redirect.
         </p>
       </div>
-      <LinksTable links={links} loading={loading} />
+      <LinksTable
+        links={links}
+        loading={loading}
+        onDelete={(slug) => {
+          const prev = links;
+          setLinks((curr) => curr?.filter((l) => l.slug !== slug) ?? null);
+          void (async () => {
+            const res = await api.links[":slug"].$delete({ param: { slug } });
+            if (!res.ok) setLinks(prev);
+          })();
+        }}
+      />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Check, Copy, ExternalLink } from "lucide-react";
+import { Check, Copy, ExternalLink, Trash2 } from "lucide-react";
 import { type InferResponseType } from "hono/client";
 import { api, API_BASE } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -65,65 +65,81 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-const columns: ColumnDef<ListedLink>[] = [
-  {
-    accessorKey: "slug",
-    header: "Short URL",
-    cell: ({ row }) => {
-      const url = `${API_BASE}/${row.original.slug}`;
-      return (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
-        >
-          <span className="truncate">{url}</span>
-          <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-        </a>
-      );
+function buildColumns(
+  onDelete: (slug: string) => void,
+): ColumnDef<ListedLink>[] {
+  return [
+    {
+      accessorKey: "slug",
+      header: "Short URL",
+      cell: ({ row }) => {
+        const url = `${API_BASE}/${row.original.slug}`;
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
+          >
+            <span className="truncate">{url}</span>
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+          </a>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "targetUrl",
-    header: "Destination",
-    cell: ({ row }) => (
-      <span className="block max-w-[260px] truncate text-sm text-muted-foreground">
-        {row.original.targetUrl}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created",
-    cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground whitespace-nowrap">
-        {formatRelative(row.original.createdAt)}
-      </span>
-    ),
-  },
-  {
-    id: "actions",
-    header: () => <span className="sr-only">Actions</span>,
-    cell: ({ row }) => (
-      <div className="text-right">
-        <CopyButton text={`${API_BASE}/${row.original.slug}`} />
-      </div>
-    ),
-  },
-];
+    {
+      accessorKey: "targetUrl",
+      header: "Destination",
+      cell: ({ row }) => (
+        <span className="block max-w-[260px] truncate text-sm text-muted-foreground">
+          {row.original.targetUrl}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created",
+      cell: ({ row }) => (
+        <span className="text-sm text-muted-foreground whitespace-nowrap">
+          {formatRelative(row.original.createdAt)}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: () => <span className="sr-only">Actions</span>,
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-1">
+          <CopyButton text={`${API_BASE}/${row.original.slug}`} />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              onDelete(row.original.slug);
+            }}
+            aria-label="Delete link"
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+}
 
 interface LinksTableProps {
   links: ListedLink[] | null;
   loading: boolean;
+  onDelete: (slug: string) => void;
 }
 
 const SKELETON_ROW_COUNT = 4;
 
-export function LinksTable({ links, loading }: LinksTableProps) {
+export function LinksTable({ links, loading, onDelete }: LinksTableProps) {
   const table = useReactTable({
     data: links ?? [],
-    columns,
+    columns: buildColumns(onDelete),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -157,14 +173,14 @@ export function LinksTable({ links, loading }: LinksTableProps) {
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className="ml-auto h-8 w-8 rounded-md" />
+                  <Skeleton className="ml-auto h-8 w-16 rounded-md" />
                 </TableCell>
               </TableRow>
             ))
           ) : table.getRowModel().rows.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={columns.length}
+                colSpan={4}
                 className="h-32 text-center text-sm text-muted-foreground"
               >
                 No links yet. Create one from the homepage.

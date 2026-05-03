@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { db } from "@url-shortener/database";
 import { links } from "@url-shortener/database/schema";
 import type { AppEnv } from "../lib/context";
@@ -55,8 +55,27 @@ export const linksRoutes = new Hono<AppEnv>()
         createdAt: links.createdAt,
       })
       .from(links)
-      .where(eq(links.userId, user.id))
+      .where(and(eq(links.userId, user.id), isNull(links.deletedAt)))
       .orderBy(desc(links.createdAt));
 
     return c.json({ links: rows });
+  })
+  .delete("/:slug", requireAuth, async (c) => {
+    const user = c.get("user");
+    const slug = c.req.param("slug").toLowerCase();
+
+    const [row] = await db
+      .update(links)
+      .set({ deletedAt: new Date() })
+      .where(
+        and(
+          eq(links.slug, slug),
+          eq(links.userId, user.id),
+          isNull(links.deletedAt),
+        ),
+      )
+      .returning({ slug: links.slug });
+
+    if (!row) return c.json({ error: "Not found" }, 404);
+    return c.json({ slug: row.slug });
   });
