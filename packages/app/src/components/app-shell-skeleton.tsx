@@ -1,0 +1,27 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
+export function AppShellSkeleton() {
+  return (
+    <div className="min-h-svh bg-background">
+      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-8 w-24" />
+        </div>
+      </header>
+      <main className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 px-4 py-16">
+        <div className="w-full space-y-2 text-center">
+          <Skeleton className="mx-auto h-8 w-64" />
+          <Skeleton className="mx-auto h-4 w-80" />
+        </div>
+        <div className="w-full space-y-4 rounded-lg border p-6">
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-4 w-56" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </main>
+    </div>
+  );
+}
