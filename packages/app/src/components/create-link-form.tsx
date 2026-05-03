@@ -1,8 +1,7 @@
 import { useForm } from "@tanstack/react-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FormField } from "@/components/form-field";
+import { FormSubmit } from "@/components/form-submit";
 
 type SlugMode = "random" | "custom";
 
@@ -41,21 +40,13 @@ export function CreateLinkForm({ onSubmit }: CreateLinkFormProps) {
     >
       <form.Field name="url">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>URL</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="url"
-              required
-              placeholder="https://example.com/very/long/path"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => {
-                field.handleChange(e.target.value);
-              }}
-            />
-          </div>
+          <FormField
+            field={field}
+            label="URL"
+            type="url"
+            required
+            placeholder="https://example.com/very/long/path"
+          />
         )}
       </form.Field>
 
@@ -76,24 +67,16 @@ export function CreateLinkForm({ onSubmit }: CreateLinkFormProps) {
                 We&apos;ll generate a random slug for you.
               </p>
             </TabsContent>
-            <TabsContent value="custom" className="pt-2 space-y-2">
+            <TabsContent value="custom" className="pt-2">
               <form.Field name="customSlug">
                 {(field) => (
-                  <>
-                    <Label htmlFor={field.name}>Custom slug</Label>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      required={modeField.state.value === "custom"}
-                      pattern="[A-Za-z0-9_-]+"
-                      placeholder="my-link"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                      }}
-                    />
-                  </>
+                  <FormField
+                    field={field}
+                    label="Custom slug"
+                    required={modeField.state.value === "custom"}
+                    pattern="[A-Za-z0-9_-]+"
+                    placeholder="my-link"
+                  />
                 )}
               </form.Field>
             </TabsContent>
@@ -101,13 +84,7 @@ export function CreateLinkForm({ onSubmit }: CreateLinkFormProps) {
         )}
       </form.Field>
 
-      <form.Subscribe selector={(s) => s.isSubmitting}>
-        {(isSubmitting) => (
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Shortening…" : "Shorten"}
-          </Button>
-        )}
-      </form.Subscribe>
+      <FormSubmit form={form} idleLabel="Shorten" loadingLabel="Shortening…" />
     </form>
   );
 }

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { signIn, signUp } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,20 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-interface LoginValues {
-  email: string;
-  password: string;
-}
-
-interface SignupValues {
-  name: string;
-  email: string;
-  password: string;
-}
+import { FormField } from "@/components/form-field";
+import { FormSubmit } from "@/components/form-submit";
 
 function ErrorMessage({ message }: { message: string | null }) {
   if (!message) return null;
@@ -37,13 +25,10 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm({
-    defaultValues: { email: "", password: "" } satisfies LoginValues,
+    defaultValues: { email: "", password: "" },
     onSubmit: async ({ value }) => {
       setError(null);
-      const { error } = await signIn.email({
-        email: value.email,
-        password: value.password,
-      });
+      const { error } = await signIn.email(value);
       if (error) setError(error.message ?? "Sign in failed");
     },
   });
@@ -59,53 +44,28 @@ function LoginForm() {
     >
       <form.Field name="email">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>Email</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="email"
-              required
-              autoComplete="email"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => {
-                field.handleChange(e.target.value);
-              }}
-            />
-          </div>
+          <FormField
+            field={field}
+            label="Email"
+            type="email"
+            required
+            autoComplete="email"
+          />
         )}
       </form.Field>
-
       <form.Field name="password">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>Password</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="password"
-              required
-              autoComplete="current-password"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => {
-                field.handleChange(e.target.value);
-              }}
-            />
-          </div>
+          <FormField
+            field={field}
+            label="Password"
+            type="password"
+            required
+            autoComplete="current-password"
+          />
         )}
       </form.Field>
-
       <ErrorMessage message={error} />
-
-      <form.Subscribe selector={(s) => s.isSubmitting}>
-        {(isSubmitting) => (
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in…" : "Sign in"}
-          </Button>
-        )}
-      </form.Subscribe>
+      <FormSubmit form={form} idleLabel="Sign in" loadingLabel="Signing in…" />
     </form>
   );
 }
@@ -114,18 +74,10 @@ function SignupForm() {
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm({
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-    } satisfies SignupValues,
+    defaultValues: { name: "", email: "", password: "" },
     onSubmit: async ({ value }) => {
       setError(null);
-      const { error } = await signUp.email({
-        name: value.name,
-        email: value.email,
-        password: value.password,
-      });
+      const { error } = await signUp.email(value);
       if (error) setError(error.message ?? "Sign up failed");
     },
   });
@@ -141,73 +93,38 @@ function SignupForm() {
     >
       <form.Field name="name">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>Name</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              required
-              autoComplete="name"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => {
-                field.handleChange(e.target.value);
-              }}
-            />
-          </div>
+          <FormField field={field} label="Name" required autoComplete="name" />
         )}
       </form.Field>
-
       <form.Field name="email">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>Email</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="email"
-              required
-              autoComplete="email"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => {
-                field.handleChange(e.target.value);
-              }}
-            />
-          </div>
+          <FormField
+            field={field}
+            label="Email"
+            type="email"
+            required
+            autoComplete="email"
+          />
         )}
       </form.Field>
-
       <form.Field name="password">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>Password</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => {
-                field.handleChange(e.target.value);
-              }}
-            />
-          </div>
+          <FormField
+            field={field}
+            label="Password"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+          />
         )}
       </form.Field>
-
       <ErrorMessage message={error} />
-
-      <form.Subscribe selector={(s) => s.isSubmitting}>
-        {(isSubmitting) => (
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Creating account…" : "Create account"}
-          </Button>
-        )}
-      </form.Subscribe>
+      <FormSubmit
+        form={form}
+        idleLabel="Create account"
+        loadingLabel="Creating account…"
+      />
     </form>
   );
 }

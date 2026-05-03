@@ -1,74 +1,19 @@
-import { useEffect, useState } from "react";
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Check, Copy, ExternalLink, Trash2 } from "lucide-react";
-import { type InferResponseType } from "hono/client";
-import { api, API_BASE } from "@/lib/api";
+import { type ColumnDef } from "@tanstack/react-table";
+import { ExternalLink, Trash2 } from "lucide-react";
+import { API_BASE, type Link } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { CopyButton } from "@/components/copy-button";
+import { DataTable } from "@/components/data-table";
+import { RelativeTime } from "@/components/relative-time";
 
-export type ListedLink = InferResponseType<
-  (typeof api.links)["$get"]
->["links"][number];
-
-const RELATIVE = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-
-function formatRelative(iso: string): string {
-  const then = new Date(iso).getTime();
-  const now = Date.now();
-  const diffSec = Math.round((then - now) / 1000);
-  const abs = Math.abs(diffSec);
-  if (abs < 60) return RELATIVE.format(diffSec, "second");
-  if (abs < 3600) return RELATIVE.format(Math.round(diffSec / 60), "minute");
-  if (abs < 86400) return RELATIVE.format(Math.round(diffSec / 3600), "hour");
-  return RELATIVE.format(Math.round(diffSec / 86400), "day");
+interface LinksTableProps {
+  links: Link[] | undefined;
+  loading: boolean;
+  onDelete: (slug: string) => void;
 }
 
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!copied) return;
-    const t = setTimeout(() => {
-      setCopied(false);
-    }, 1500);
-    return () => {
-      clearTimeout(t);
-    };
-  }, [copied]);
-
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => {
-        void navigator.clipboard.writeText(text).then(() => {
-          setCopied(true);
-        });
-      }}
-      aria-label={copied ? "Copied" : "Copy short URL"}
-    >
-      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-    </Button>
-  );
-}
-
-function buildColumns(
-  onDelete: (slug: string) => void,
-): ColumnDef<ListedLink>[] {
-  return [
+export function LinksTable({ links, loading, onDelete }: LinksTableProps) {
+  const columns: ColumnDef<Link>[] = [
     {
       accessorKey: "slug",
       header: "Short URL",
@@ -100,9 +45,10 @@ function buildColumns(
       accessorKey: "createdAt",
       header: "Created",
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {formatRelative(row.original.createdAt)}
-        </span>
+        <RelativeTime
+          iso={row.original.createdAt}
+          className="text-sm text-muted-foreground whitespace-nowrap"
+        />
       ),
     },
     {
@@ -126,79 +72,13 @@ function buildColumns(
       ),
     },
   ];
-}
-
-interface LinksTableProps {
-  links: ListedLink[] | null;
-  loading: boolean;
-  onDelete: (slug: string) => void;
-}
-
-const SKELETON_ROW_COUNT = 4;
-
-export function LinksTable({ links, loading, onDelete }: LinksTableProps) {
-  const table = useReactTable({
-    data: links ?? [],
-    columns: buildColumns(onDelete),
-    getCoreRowModel: getCoreRowModel(),
-  });
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id}>
-              {hg.headers.map((h) => (
-                <TableHead key={h.id}>
-                  {h.isPlaceholder
-                    ? null
-                    : flexRender(h.column.columnDef.header, h.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {loading ? (
-            Array.from({ length: SKELETON_ROW_COUNT }).map((_, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <Skeleton className="h-4 w-48" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-56" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-20" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="ml-auto h-8 w-16 rounded-md" />
-                </TableCell>
-              </TableRow>
-            ))
-          ) : table.getRowModel().rows.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={4}
-                className="h-32 text-center text-sm text-muted-foreground"
-              >
-                No links yet. Create one from the homepage.
-              </TableCell>
-            </TableRow>
-          ) : (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={links}
+      loading={loading}
+      emptyMessage="No links yet. Create one from the homepage."
+    />
   );
 }
