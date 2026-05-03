@@ -136,62 +136,16 @@ The repo's `railway.toml` is a single-service config: build the SPA, run pending
 | `BETTER_AUTH_URL`    | Public URL of the deploy                            |
 | `WEB_URL`            | Same as `BETTER_AUTH_URL` (single-origin)           |
 
-### Deploy to Railway via CLI
+### Deploy to Railway
 
-```bash
-brew install railway        # or: npm i -g @railway/cli
-railway login
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/kVeVsN?referralCode=4FPEt4&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
-# From the repo root
-railway init                # creates the project (pick a region close to you)
-```
+One click provisions the app service, Postgres, and Redis with all environment variables wired up. `BETTER_AUTH_SECRET` is auto-generated; `DATABASE_URL` and `REDIS_URL` reference the provisioned databases via `${{Postgres.DATABASE_URL}}` / `${{Redis.REDIS_URL}}`; `BETTER_AUTH_URL` and `WEB_URL` use `${{RAILWAY_PUBLIC_DOMAIN}}`. On every deploy, `preDeployCommand` runs pending Drizzle migrations — failed migrations abort the deploy and the previous version stays live.
 
-**1. Create the app service first.** `railway init` only creates an empty project — it does not create a service for your code. Add one before anything else, otherwise `railway add --database` will leave the CLI linked to that database and `railway up` will deploy your code into the database service slot.
+After the first deploy, optionally:
 
-```bash
-railway add --service url-shortener
-railway service url-shortener   # link the CLI to the new service
-```
-
-**2. Add the databases.**
-
-```bash
-railway add --database postgres
-railway add --database redis
-railway service url-shortener   # re-link to the app — `add --database` switches the link
-```
-
-**3. Generate a public domain on the app service.** `${{RAILWAY_PUBLIC_DOMAIN}}` only resolves once a domain exists; without this, `BETTER_AUTH_URL` and `WEB_URL` end up as just `https://`.
-
-```bash
-railway domain                  # creates a *.up.railway.app subdomain
-```
-
-**4. Set env vars on the app service.** Use `${{Postgres.DATABASE_URL}}` (not `_PRIVATE_URL` — the standard `DATABASE_URL` already points to the internal hostname).
-
-```bash
-railway variables \
-  --set "BETTER_AUTH_SECRET=$(openssl rand -base64 32)" \
-  --set 'BETTER_AUTH_URL=https://${{RAILWAY_PUBLIC_DOMAIN}}' \
-  --set 'WEB_URL=https://${{RAILWAY_PUBLIC_DOMAIN}}' \
-  --set 'DATABASE_URL=${{Postgres.DATABASE_URL}}' \
-  --set 'REDIS_URL=${{Redis.REDIS_URL}}'
-
-railway variables               # double-check none are empty before deploying
-```
-
-**5. Deploy.** Build runs first, then `preDeployCommand` applies pending migrations against the live DB, then the new container starts. Migration failures abort the deploy and the previous version stays live.
-
-```bash
-railway up
-railway open
-```
-
-#### After the first deploy
-
-- Link the GitHub repo in the dashboard so pushes to `main` auto-deploy. `railway up` is mainly useful for the first deploy and out-of-band hotfixes.
-- Make sure all four services (app, Postgres, Redis) live in the same region — every redirect that hits the cache-miss path round-trips to the DB. Region is set per service: dashboard → Service → Settings → Region.
-- Optional hardening: in each DB service, **Settings → Networking → Public Networking → off**. The `${{Postgres.DATABASE_URL}}` reference keeps working (it resolves to the internal hostname). Tradeoff: `railway run` from your laptop can no longer reach the DB, so any ad-hoc query work has to happen via the dashboard's web shell.
+- **Co-locate services in one region** — dashboard → Service → Settings → Region. Cache-miss redirects round-trip to Postgres, so cross-region adds latency.
+- **Disable public networking on Postgres + Redis** — Service → Settings → Networking. The `${{Postgres.DATABASE_URL}}` reference keeps working (it resolves to the internal hostname). Tradeoff: `railway run` from your laptop can no longer reach the DBs.
 
 ### Other hosts
 
