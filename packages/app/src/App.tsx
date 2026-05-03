@@ -1,100 +1,66 @@
-import { useState } from "react";
-import { type InferResponseType } from "hono/client";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { signOut, useSession } from "@/lib/auth-client";
-import { api } from "@/lib/api";
 import { AuthForm } from "@/components/auth-form";
-import { CreateLinkForm } from "@/components/create-link-form";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Header } from "@/components/header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { HomePage } from "@/pages/home-page";
+import { LinksPage } from "@/pages/links-page";
 
-type CreatedLink = InferResponseType<(typeof api.links)["$post"], 201>;
+function AppShellSkeleton() {
+  return (
+    <div className="min-h-svh bg-background">
+      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-8 w-24" />
+        </div>
+      </header>
+      <main className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 px-4 py-16">
+        <div className="w-full space-y-2 text-center">
+          <Skeleton className="mx-auto h-8 w-64" />
+          <Skeleton className="mx-auto h-4 w-80" />
+        </div>
+        <div className="w-full space-y-4 rounded-lg border p-6">
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-4 w-56" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </main>
+    </div>
+  );
+}
 
 function App() {
   const { data: session, isPending } = useSession();
-  const [result, setResult] = useState<CreatedLink | null>(null);
-  const [error, setError] = useState<string | null>(null);
+
+  if (isPending) return <AppShellSkeleton />;
+
+  if (!session) {
+    return (
+      <main className="grid min-h-svh place-items-center bg-background p-4">
+        <AuthForm />
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-svh flex items-center justify-center p-4 bg-background">
-      {isPending ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
-      ) : session ? (
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-start justify-between gap-4">
-            <div className="space-y-1">
-              <CardTitle>URL Shortener</CardTitle>
-              <CardDescription>
-                Signed in as {session.user.email}.
-              </CardDescription>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                void signOut();
-              }}
-            >
-              Sign out
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <CreateLinkForm
-              onSubmit={async (values) => {
-                setError(null);
-                setResult(null);
-                const res = await api.links.$post({
-                  json: {
-                    targetUrl: values.url,
-                    ...(values.mode === "custom"
-                      ? { customSlug: values.customSlug }
-                      : {}),
-                  },
-                });
-                if (res.status === 201) {
-                  setResult(await res.json());
-                  return;
-                }
-                const data = (await res.json()) as { error?: string };
-                setError(
-                  data.error ?? `Request failed (${String(res.status)})`,
-                );
-              }}
-            />
-
-            {error && (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            )}
-
-            {result && (
-              <div className="rounded-md border bg-muted/40 p-3 text-sm space-y-1">
-                <div className="text-muted-foreground">Short URL</div>
-                <a
-                  href={result.shortUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium underline-offset-2 hover:underline break-all"
-                >
-                  {result.shortUrl}
-                </a>
-                <div className="text-muted-foreground break-all">
-                  → {result.targetUrl}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <AuthForm />
-      )}
-    </main>
+    <BrowserRouter>
+      <div className="min-h-svh bg-background">
+        <Header
+          email={session.user.email}
+          onSignOut={() => {
+            void signOut();
+          }}
+        />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/links" element={<LinksPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
