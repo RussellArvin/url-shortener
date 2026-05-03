@@ -55,6 +55,21 @@ describe("POST /api/links", () => {
     expect(body.slug).toBe("my-link");
   });
 
+  test("rejects reserved slugs with 400", async () => {
+    const cookie = await signUpAndGetCookie("a@a.com", "password1234");
+    for (const slug of ["api", "links", "assets"]) {
+      const res = await app.request("/api/links", {
+        method: "POST",
+        headers: { "content-type": "application/json", cookie },
+        body: JSON.stringify({
+          targetUrl: "https://example.com",
+          customSlug: slug,
+        }),
+      });
+      expect(res.status).toBe(400);
+    }
+  });
+
   test("rejects duplicate slug with 409", async () => {
     const cookie = await signUpAndGetCookie("a@a.com", "password1234");
     const make = () =>

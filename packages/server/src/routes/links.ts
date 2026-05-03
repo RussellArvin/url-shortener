@@ -9,12 +9,17 @@ import { cache } from "../lib/cache";
 import { requireAuth } from "../lib/middleware";
 import { generateSlug } from "../lib/slug";
 
+// Reserved at the app's URL root: /api/*, /links (SPA page), /assets/* (Vite output).
+// Random slugs are 7 chars so can't collide; only custom slugs need this guard.
+const RESERVED_SLUGS = new Set(["api", "links", "assets"]);
+
 const createLinkSchema = z.object({
   targetUrl: z.url({ protocol: /^https?$/ }),
   customSlug: z
     .string()
     .toLowerCase()
-    .regex(/^[a-z0-9_-]{1,32}$/, "Slug must be 1-32 chars: a-z, 0-9, _ or -")
+    .regex(/^[a-z0-9_-]{1,30}$/, "Slug must be 1-30 chars: a-z, 0-9, _ or -")
+    .refine((s) => !RESERVED_SLUGS.has(s), "This slug is reserved")
     .optional(),
 });
 

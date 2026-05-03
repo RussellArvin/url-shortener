@@ -75,6 +75,7 @@ export function CreateLinkForm({ onSubmit }: CreateLinkFormProps) {
                     label="Custom slug"
                     required={modeField.state.value === "custom"}
                     pattern="[A-Za-z0-9_-]+"
+                    maxLength={30}
                     placeholder="my-link"
                   />
                 )}

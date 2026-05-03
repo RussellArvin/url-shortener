@@ -1,11 +1,14 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { serveStatic } from "hono/bun";
 import { auth } from "./lib/auth";
 import type { AppEnv } from "./lib/context";
 import { env } from "./lib/env";
 import { requireAuth } from "./lib/middleware";
 import { linksRoutes } from "./routes/links";
 import { redirectRoutes } from "./routes/redirect";
+
+const APP_DIST = "../app/dist";
 
 const app = new Hono<AppEnv>();
 
@@ -42,12 +45,17 @@ export const apiRoutes = app
 
 export type ApiRoutes = typeof apiRoutes;
 
+// Static SPA assets and React Router pages — must be registered before /:slug
+app.use("/assets/*", serveStatic({ root: APP_DIST }));
+app.get("/", serveStatic({ path: `${APP_DIST}/index.html` }));
+app.get("/links", serveStatic({ path: `${APP_DIST}/index.html` }));
+
 // Public redirect — must be registered last so /:slug doesn't shadow other routes
 app.route("/", redirectRoutes);
 
 export { app };
 
 export default {
-  port: 3000,
+  port: Number(process.env["PORT"]) || 3000,
   fetch: app.fetch,
 };
