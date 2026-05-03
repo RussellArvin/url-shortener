@@ -2,9 +2,16 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { signOut, useSession } from "@/lib/auth-client";
 import { AuthForm } from "@/components/auth-form";
 import { Header } from "@/components/header";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HomePage } from "@/pages/home-page";
 import { LinksPage } from "@/pages/links-page";
+
+function ThemeToggleFab() {
+  return (
+    <AnimatedThemeToggler className="fixed bottom-4 right-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm transition-colors hover:text-foreground [&_svg]:size-4" />
+  );
+}
 
 function AppShellSkeleton() {
   return (
@@ -39,9 +46,12 @@ function App() {
 
   if (!session) {
     return (
-      <main className="grid min-h-svh place-items-center bg-background p-4">
-        <AuthForm />
-      </main>
+      <>
+        <main className="grid min-h-svh place-items-center bg-background p-4">
+          <AuthForm />
+        </main>
+        <ThemeToggleFab />
+      </>
     );
   }
 
@@ -59,6 +69,7 @@ function App() {
           <Route path="/links" element={<LinksPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ThemeToggleFab />
       </div>
     </BrowserRouter>
   );

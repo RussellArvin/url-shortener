@@ -41,6 +41,12 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["node_modules/", "dist/", "packages/*/dist/"],
+    ignores: [
+      "node_modules/",
+      "dist/",
+      "packages/*/dist/",
+      // shadcn / vendored UI primitives — not our code
+      "packages/app/src/components/ui/",
+    ],
   },
 );
