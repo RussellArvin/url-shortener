@@ -4,5 +4,6 @@
     "eslint.config.ts",
     "packages/*/src/**/*.ts",
     "packages/*/drizzle.config.ts"
-  ]
+  ],
+  "exclude": ["packages/app"]
 }

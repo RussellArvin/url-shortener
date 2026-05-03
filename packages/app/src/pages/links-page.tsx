@@ -1,29 +1,10 @@
-import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
-import { LinksTable, type ListedLink } from "@/components/links-table";
+import { useDeleteLink } from "@/hooks/useDeleteLink";
+import { useLinks } from "@/hooks/useLinks";
+import { LinksTable } from "@/components/links-table";
 
 export function LinksPage() {
-  const [links, setLinks] = useState<ListedLink[] | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const ctl = new AbortController();
-    void (async () => {
-      try {
-        const res = await api.links.$get(undefined, {
-          init: { signal: ctl.signal },
-        });
-        if (res.ok) setLinks((await res.json()).links);
-      } catch {
-        // aborted or network failure
-      } finally {
-        if (!ctl.signal.aborted) setLoading(false);
-      }
-    })();
-    return () => {
-      ctl.abort();
-    };
-  }, []);
+  const { data: links, isPending } = useLinks();
+  const deleteLink = useDeleteLink();
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
@@ -34,15 +15,10 @@ export function LinksPage() {
         </p>
       </div>
       <LinksTable
-        links={links}
-        loading={loading}
+        links={links ?? null}
+        loading={isPending}
         onDelete={(slug) => {
-          const prev = links;
-          setLinks((curr) => curr?.filter((l) => l.slug !== slug) ?? null);
-          void (async () => {
-            const res = await api.links[":slug"].$delete({ param: { slug } });
-            if (!res.ok) setLinks(prev);
-          })();
+          deleteLink.mutate(slug);
         }}
       />
     </div>

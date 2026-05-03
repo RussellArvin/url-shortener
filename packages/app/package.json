@@ -14,6 +14,7 @@
     "@fontsource-variable/geist": "^5.2.8",
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/react-form": "^1.29.1",
+    "@tanstack/react-query": "^5.100.9",
     "@tanstack/react-table": "^8.21.3",
     "@url-shortener/server": "workspace:*",
     "better-auth": "^1.6.9",

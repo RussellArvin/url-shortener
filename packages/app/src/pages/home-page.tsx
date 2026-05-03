@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { Check, Copy, ExternalLink } from "lucide-react";
 import { type InferResponseType } from "hono/client";
-import { api, API_BASE } from "@/lib/api";
+import { type api, API_BASE } from "@/lib/api";
+import { useCreateLink } from "@/hooks/useCreateLink";
 import { CreateLinkForm } from "@/components/create-link-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import {
 type CreatedLink = InferResponseType<(typeof api.links)["$post"], 201>;
 
 export function HomePage() {
+  const create = useCreateLink();
   const [result, setResult] = useState<CreatedLink | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,20 +43,17 @@ export function HomePage() {
           <CreateLinkForm
             onSubmit={async (values) => {
               setError(null);
-              const res = await api.links.$post({
-                json: {
+              try {
+                const link = await create.mutateAsync({
                   targetUrl: values.url,
                   ...(values.mode === "custom"
                     ? { customSlug: values.customSlug }
                     : {}),
-                },
-              });
-              if (res.status === 201) {
-                setResult(await res.json());
-                return;
+                });
+                setResult(link);
+              } catch (e) {
+                setError(e instanceof Error ? e.message : "Failed");
               }
-              const data = (await res.json()) as { error?: string };
-              setError(data.error ?? `Request failed (${String(res.status)})`);
             }}
           />
           {error && (
