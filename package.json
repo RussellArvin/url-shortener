@@ -1,0 +1,34 @@
+{
+  "name": "bun-mono-template",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "bunx tsc --noEmit",
+    "drizzle:generate": "bun run --filter '@repo/database' drizzle:generate",
+    "drizzle:migrate": "bun run --filter '@repo/database' drizzle:migrate",
+    "drizzle:push": "bun run --filter '@repo/database' drizzle:push",
+    "drizzle:studio": "bun run --filter '@repo/database' drizzle:studio",
+    "test": "bun test",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/bun": "latest",
+    "eslint": "^10.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "husky": "^9.1.7",
+    "jiti": "^2.6.1",
+    "prettier": "^3.8.2",
+    "typescript": "^5",
+    "typescript-eslint": "^8.58.1"
+  }
+}

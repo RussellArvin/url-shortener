@@ -1,0 +1,17 @@
+commit_msg=$(cat "$1")
+
+# Conventional commits: type: description
+# Allowed types: feat, fix, chore, docs, style, refactor, perf, test, build, ci, revert
+pattern="^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert): .+"
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo "ERROR: Commit message does not follow conventional commits format."
+  echo ""
+  echo "Expected: <type>: <description>"
+  echo "Allowed types: feat, fix, chore, docs, style, refactor, perf, test, build, ci, revert"
+  echo ""
+  echo "Example: feat: add user authentication"
+  echo ""
+  echo "Got: $commit_msg"
+  exit 1
+fi
