@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-table";
 import { Check, Copy, ExternalLink } from "lucide-react";
 import { type InferResponseType } from "hono/client";
-import { api } from "@/lib/api";
+import { api, API_BASE } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -67,19 +67,22 @@ function CopyButton({ text }: { text: string }) {
 
 const columns: ColumnDef<ListedLink>[] = [
   {
-    accessorKey: "shortUrl",
+    accessorKey: "slug",
     header: "Short URL",
-    cell: ({ row }) => (
-      <a
-        href={row.original.shortUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
-      >
-        <span className="truncate">{row.original.shortUrl}</span>
-        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-      </a>
-    ),
+    cell: ({ row }) => {
+      const url = `${API_BASE}/${row.original.slug}`;
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium underline-offset-2 hover:underline"
+        >
+          <span className="truncate">{url}</span>
+          <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+        </a>
+      );
+    },
   },
   {
     accessorKey: "targetUrl",
@@ -104,7 +107,7 @@ const columns: ColumnDef<ListedLink>[] = [
     header: () => <span className="sr-only">Actions</span>,
     cell: ({ row }) => (
       <div className="text-right">
-        <CopyButton text={row.original.shortUrl} />
+        <CopyButton text={`${API_BASE}/${row.original.slug}`} />
       </div>
     ),
   },

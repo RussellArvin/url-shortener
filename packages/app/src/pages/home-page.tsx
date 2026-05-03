@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { Check, Copy, ExternalLink } from "lucide-react";
 import { type InferResponseType } from "hono/client";
-import { api } from "@/lib/api";
+import { api, API_BASE } from "@/lib/api";
 import { CreateLinkForm } from "@/components/create-link-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,6 +72,7 @@ export function HomePage() {
 
 function ResultPanel({ link }: { link: CreatedLink }) {
   const [copied, setCopied] = useState(false);
+  const url = `${API_BASE}/${link.slug}`;
 
   return (
     <Card className="w-full border-emerald-500/40 bg-emerald-50/40 dark:bg-emerald-950/20">
@@ -81,12 +82,12 @@ function ResultPanel({ link }: { link: CreatedLink }) {
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2">
           <a
-            href={link.shortUrl}
+            href={url}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-w-0 items-center gap-1 text-base font-medium underline-offset-2 hover:underline"
           >
-            <span className="truncate">{link.shortUrl}</span>
+            <span className="truncate">{url}</span>
             <ExternalLink className="h-4 w-4 shrink-0" />
           </a>
           <Button
@@ -94,7 +95,7 @@ function ResultPanel({ link }: { link: CreatedLink }) {
             size="sm"
             className="ml-auto"
             onClick={() => {
-              void navigator.clipboard.writeText(link.shortUrl).then(() => {
+              void navigator.clipboard.writeText(url).then(() => {
                 setCopied(true);
                 setTimeout(() => {
                   setCopied(false);
