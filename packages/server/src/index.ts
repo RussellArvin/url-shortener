@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { auth } from "./lib/auth";
 import type { AppEnv } from "./lib/context";
+import { requireAuth } from "./lib/middleware";
 import { linksRoutes } from "./routes/links";
 import { redirectRoutes } from "./routes/redirect";
 
@@ -29,13 +30,16 @@ app.use("*", async (c, next) => {
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 
-app.get("/api/me", (c) => {
-  const user = c.get("user");
-  if (!user) return c.json({ error: "Unauthorized" }, 401);
-  return c.json({ user });
-});
+// Typed API surface — exported below as ApiRoutes for the RPC client
+export const apiRoutes = app
+  .basePath("/api")
+  .route("/links", linksRoutes)
+  .get("/me", requireAuth, (c) => {
+    const user = c.get("user");
+    return c.json({ user });
+  });
 
-app.route("/api/links", linksRoutes);
+export type ApiRoutes = typeof apiRoutes;
 
 // Public redirect — must be registered last so /:slug doesn't shadow other routes
 app.route("/", redirectRoutes);

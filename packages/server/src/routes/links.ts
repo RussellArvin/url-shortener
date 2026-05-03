@@ -21,13 +21,8 @@ const createLinkSchema = z.object({
     .optional(),
 });
 
-export const linksRoutes = new Hono<AppEnv>();
-
-linksRoutes.post(
-  "/",
-  requireAuth,
-  zValidator("json", createLinkSchema),
-  async (c) => {
+export const linksRoutes = new Hono<AppEnv>()
+  .post("/", requireAuth, zValidator("json", createLinkSchema), async (c) => {
     const user = c.get("user");
     const { targetUrl, customSlug } = c.req.valid("json");
     const slug = customSlug ?? generateSlug();
@@ -54,23 +49,21 @@ linksRoutes.post(
       }
       throw err;
     }
-  },
-);
+  })
+  .get("/", requireAuth, async (c) => {
+    const user = c.get("user");
 
-linksRoutes.get("/", requireAuth, async (c) => {
-  const user = c.get("user");
+    const rows = await db
+      .select({
+        slug: links.slug,
+        targetUrl: links.targetUrl,
+        createdAt: links.createdAt,
+      })
+      .from(links)
+      .where(eq(links.userId, user.id))
+      .orderBy(desc(links.createdAt));
 
-  const rows = await db
-    .select({
-      slug: links.slug,
-      targetUrl: links.targetUrl,
-      createdAt: links.createdAt,
-    })
-    .from(links)
-    .where(eq(links.userId, user.id))
-    .orderBy(desc(links.createdAt));
-
-  return c.json({
-    links: rows.map((r) => ({ ...r, shortUrl: `${baseUrl()}/${r.slug}` })),
+    return c.json({
+      links: rows.map((r) => ({ ...r, shortUrl: `${baseUrl()}/${r.slug}` })),
+    });
   });
-});
