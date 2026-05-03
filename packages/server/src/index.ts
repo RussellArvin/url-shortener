@@ -12,7 +12,7 @@ interface Variables {
 const app = new Hono<{ Variables: Variables }>();
 
 app.use(
-  "/api/auth/*",
+  "/api/*",
   cors({
     origin: "http://localhost:5173",
     allowHeaders: ["Content-Type", "Authorization"],
