@@ -21,8 +21,5 @@
     "hono": "^4",
     "nanoid": "^5.1.11",
     "zod": "^4.4.2"
-  },
-  "devDependencies": {
-    "@better-auth/cli": "^1.4.21"
   }
 }
