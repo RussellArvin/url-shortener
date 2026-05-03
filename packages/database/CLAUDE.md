@@ -27,8 +27,8 @@ Drizzle ORM with PostgreSQL via `drizzle-orm/bun-sql`.
 ## Querying
 
 ```ts
-import { db } from "@repo/database";
-import { myTable } from "@repo/database/schema";
+import { db } from "@url-shortener/database";
+import { myTable } from "@url-shortener/database/schema";
 import { eq } from "drizzle-orm";
 
 // Select

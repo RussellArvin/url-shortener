@@ -13,16 +13,16 @@ bun run dev
 
 ```
 packages/
-  shared/     @repo/shared    — shared types and utilities
-  app/        @repo/app       — Hono API server (port 3000)
-  database/   @repo/database  — Drizzle ORM + PostgreSQL
+  shared/     @url-shortener/shared    — shared types and utilities
+  app/        @url-shortener/app       — Hono API server (port 3000)
+  database/   @url-shortener/database  — Drizzle ORM + PostgreSQL
 ```
 
 Cross-package imports via `workspace:*`:
 
 ```ts
-import { APP_NAME } from "@repo/shared";
-import { db } from "@repo/database";
+import { APP_NAME } from "@url-shortener/shared";
+import { db } from "@url-shortener/database";
 ```
 
 ## Scripts
@@ -66,10 +66,10 @@ This template includes Claude Code configuration for AI-assisted development:
 
 ## Renaming the Scope
 
-Packages use `@repo` as the default scope. To rename to your project:
+Packages use `@url-shortener` as the scope. To rename to your project:
 
 ```bash
-sed -i '' 's/@repo/@myapp/g' package.json packages/*/package.json
+sed -i '' 's/@url-shortener/@myapp/g' package.json packages/*/package.json
 bun install
 ```
 

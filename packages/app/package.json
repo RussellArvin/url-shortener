@@ -1,5 +1,5 @@
 {
-  "name": "@repo/app",
+  "name": "@url-shortener/app",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,7 @@
     "dev": "bun --hot src/index.ts"
   },
   "dependencies": {
-    "@repo/shared": "workspace:*",
+    "@url-shortener/shared": "workspace:*",
     "hono": "^4"
   }
 }

@@ -3,8 +3,8 @@ Bun workspace monorepo. All tooling runs from the root.
 ## Architecture
 
 - Bun workspaces with `packages/*`
-- Packages: `@repo/shared`, `@repo/app` (Hono), `@repo/database` (Drizzle + Postgres)
-- Cross-package imports: `import { x } from "@repo/shared"` via `workspace:*`
+- Packages: `@url-shortener/shared`, `@url-shortener/app` (Hono), `@url-shortener/database` (Drizzle + Postgres)
+- Cross-package imports: `import { x } from "@url-shortener/shared"` via `workspace:*`
 - Shared package exports raw `.ts` — no build step
 - Dev tooling at root: TypeScript, ESLint, Prettier, Husky
 
@@ -51,7 +51,7 @@ Fix before committing: `bun run lint:fix && bun run format`
 1. Create `packages/<name>/package.json`:
    ```json
    {
-     "name": "@repo/<name>",
+     "name": "@url-shortener/<name>",
      "version": "0.0.0",
      "private": true,
      "type": "module",
@@ -69,7 +69,7 @@ Fix before committing: `bun run lint:fix && bun run format`
    }
    ```
 3. Add source in `src/`, tests in `src/__tests__/`
-4. Other packages depend on it via `"@repo/<name>": "workspace:*"` in their package.json
+4. Other packages depend on it via `"@url-shortener/<name>": "workspace:*"` in their package.json
 5. Run `bun install` to link
 
 ## Adding Routes (app package)
