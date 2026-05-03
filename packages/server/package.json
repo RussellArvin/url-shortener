@@ -7,8 +7,14 @@
     "dev": "bun --hot src/index.ts"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.6.9",
+    "@url-shortener/database": "workspace:*",
     "@url-shortener/shared": "workspace:*",
+    "better-auth": "^1.6.9",
     "hono": "^4",
     "nanoid": "^5.1.11"
+  },
+  "devDependencies": {
+    "@better-auth/cli": "^1.4.21"
   }
 }
