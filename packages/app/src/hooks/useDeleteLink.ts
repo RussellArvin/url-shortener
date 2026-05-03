@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "@/lib/api";
 
 export function useDeleteLink() {
@@ -14,7 +15,11 @@ export function useDeleteLink() {
       return res.json();
     },
     onSuccess: async () => {
+      toast.success("Link deleted");
       await queryClient.invalidateQueries({ queryKey: ["links"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 }

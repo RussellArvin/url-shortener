@@ -19,7 +19,6 @@ type CreatedLink = InferResponseType<(typeof api.links)["$post"], 201>;
 export function HomePage() {
   const create = useCreateLink();
   const [result, setResult] = useState<CreatedLink | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 px-4 py-16">
@@ -39,10 +38,9 @@ export function HomePage() {
             Paste a URL, choose a random or custom slug.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent>
           <CreateLinkForm
             onSubmit={async (values) => {
-              setError(null);
               try {
                 const link = await create.mutateAsync({
                   targetUrl: values.url,
@@ -51,16 +49,11 @@ export function HomePage() {
                     : {}),
                 });
                 setResult(link);
-              } catch (e) {
-                setError(e instanceof Error ? e.message : "Failed");
+              } catch {
+                // toast handled inside the hook
               }
             }}
           />
-          {error && (
-            <p className="text-sm text-destructive" role="alert">
-              {error}
-            </p>
-          )}
         </CardContent>
       </Card>
 

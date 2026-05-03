@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type InferRequestType } from "hono/client";
+import { toast } from "sonner";
 import { api } from "@/lib/api";
 
 type CreateLinkInput = InferRequestType<typeof api.links.$post>["json"];
@@ -17,7 +18,11 @@ export function useCreateLink() {
       return res.json();
     },
     onSuccess: async () => {
+      toast.success("Short link created");
       await queryClient.invalidateQueries({ queryKey: ["links"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 }
