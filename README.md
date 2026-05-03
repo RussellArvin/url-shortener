@@ -124,7 +124,7 @@ bun run test:e2e
 
 ## Deployment
 
-The repo's `railway.toml` is a single-service config: build the SPA, then start the Hono server which serves the SPA, the API, and slug redirects from one origin.
+The repo's `railway.toml` is a single-service config: build the SPA, run pending Drizzle migrations as a `preDeployCommand`, then start the Hono server which serves the SPA, the API, and slug redirects from one origin. Failed migrations abort the deploy and the previous version stays live.
 
 ### Required environment variables
 
@@ -154,8 +154,7 @@ railway variables \
   --set 'DATABASE_URL=${{Postgres.DATABASE_URL}}' \
   --set 'REDIS_URL=${{Redis.REDIS_URL}}'
 
-railway up                  # reads railway.toml, deploys
-railway run bun run --filter '@url-shortener/database' drizzle:migrate
+railway up                  # builds, runs migrations, deploys
 railway open
 ```
 
