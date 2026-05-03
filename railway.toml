@@ -3,6 +3,7 @@ builder = "NIXPACKS"
 buildCommand = "bun install --frozen-lockfile && bun run --filter '@url-shortener/app' build"
 
 [deploy]
+preDeployCommand = "bun run --filter '@url-shortener/database' drizzle:migrate"
 startCommand = "bun run --filter '@url-shortener/server' start"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
