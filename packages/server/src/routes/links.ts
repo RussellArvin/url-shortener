@@ -5,12 +5,9 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "@url-shortener/database";
 import { links } from "@url-shortener/database/schema";
 import type { AppEnv } from "../lib/context";
+import { env } from "../lib/env";
 import { requireAuth } from "../lib/middleware";
 import { generateSlug } from "../lib/slug";
-
-function baseUrl(): string {
-  return process.env["BETTER_AUTH_URL"] ?? "http://localhost:3000";
-}
 
 const createLinkSchema = z.object({
   targetUrl: z.url({ protocol: /^https?$/ }),
@@ -37,7 +34,7 @@ export const linksRoutes = new Hono<AppEnv>()
         {
           slug: row.slug,
           targetUrl: row.targetUrl,
-          shortUrl: `${baseUrl()}/${row.slug}`,
+          shortUrl: `${env.BETTER_AUTH_URL}/${row.slug}`,
           createdAt: row.createdAt,
         },
         201,
@@ -64,6 +61,9 @@ export const linksRoutes = new Hono<AppEnv>()
       .orderBy(desc(links.createdAt));
 
     return c.json({
-      links: rows.map((r) => ({ ...r, shortUrl: `${baseUrl()}/${r.slug}` })),
+      links: rows.map((r) => ({
+        ...r,
+        shortUrl: `${env.BETTER_AUTH_URL}/${r.slug}`,
+      })),
     });
   });

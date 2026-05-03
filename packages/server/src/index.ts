@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { auth } from "./lib/auth";
 import type { AppEnv } from "./lib/context";
+import { env } from "./lib/env";
 import { requireAuth } from "./lib/middleware";
 import { linksRoutes } from "./routes/links";
 import { redirectRoutes } from "./routes/redirect";
@@ -11,7 +12,7 @@ const app = new Hono<AppEnv>();
 app.use(
   "/api/*",
   cors({
-    origin: "http://localhost:5173",
+    origin: env.WEB_URL,
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS"],
     credentials: true,
