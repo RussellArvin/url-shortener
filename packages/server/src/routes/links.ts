@@ -5,6 +5,7 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 import { db } from "@url-shortener/database";
 import { links } from "@url-shortener/database/schema";
 import type { AppEnv } from "../lib/context";
+import { cache } from "../lib/cache";
 import { requireAuth } from "../lib/middleware";
 import { generateSlug } from "../lib/slug";
 
@@ -29,6 +30,7 @@ export const linksRoutes = new Hono<AppEnv>()
         .values({ slug, targetUrl, userId: user.id })
         .returning();
       if (!row) throw new Error("insert returned no row");
+      await cache.set(row.slug, row.targetUrl);
       return c.json(
         {
           slug: row.slug,
@@ -77,5 +79,6 @@ export const linksRoutes = new Hono<AppEnv>()
       .returning({ slug: links.slug });
 
     if (!row) return c.json({ error: "Not found" }, 404);
+    await cache.del(row.slug);
     return c.json({ slug: row.slug });
   });
