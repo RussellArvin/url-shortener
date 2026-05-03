@@ -9,9 +9,10 @@ import { cache } from "../lib/cache";
 import { requireAuth } from "../lib/middleware";
 import { generateSlug } from "../lib/slug";
 
-// Reserved at the app's URL root: /api/*, /links (SPA page), /assets/* (Vite output).
-// Random slugs are 7 chars so can't collide; only custom slugs need this guard.
-const RESERVED_SLUGS = new Set(["api", "links", "assets"]);
+// Reserved at the app's URL root: /api/*, /links (SPA page), /assets/* (Vite
+// output), /health (status endpoint). Random slugs are 7 chars so can't
+// collide; only custom slugs need this guard.
+const RESERVED_SLUGS = new Set(["api", "links", "assets", "health"]);
 
 const createLinkSchema = z.object({
   targetUrl: z.url({ protocol: /^https?$/ }),

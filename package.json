@@ -18,7 +18,7 @@
     "drizzle:push": "bun run --filter '@url-shortener/database' drizzle:push",
     "drizzle:studio": "bun run --filter '@url-shortener/database' drizzle:studio",
     "db:seed": "bun run --filter '@url-shortener/server' seed",
-    "test": "bun test packages/server packages/shared",
+    "test": "bun test packages/server",
     "test:e2e": "bun run --filter '@url-shortener/e2e' test",
     "prepare": "husky"
   },

@@ -7,7 +7,6 @@ Follow the existing patterns in this repo:
 3. Return errors with status codes: `c.json({ error: "message" }, 400)`
 4. Add corresponding tests in `packages/server/src/__tests__/routes.test.ts` using `app.request()` — no live server
 5. If the route needs database access, import from `@url-shortener/database` and `@url-shortener/database/schema` — use Drizzle query builder only (db.select(), db.insert(), etc.), never db.execute()
-6. If the route needs shared types or constants, import from `@url-shortener/shared`
 
 Run `bun test packages/server/` after implementation to verify the tests pass.
 

@@ -15,7 +15,6 @@
     "@better-auth/drizzle-adapter": "^1.6.9",
     "@hono/zod-validator": "^0.7.6",
     "@url-shortener/database": "workspace:*",
-    "@url-shortener/shared": "workspace:*",
     "better-auth": "^1.6.9",
     "drizzle-orm": "^0.44",
     "hono": "^4",

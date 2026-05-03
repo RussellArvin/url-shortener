@@ -75,17 +75,12 @@
         "@better-auth/drizzle-adapter": "^1.6.9",
         "@hono/zod-validator": "^0.7.6",
         "@url-shortener/database": "workspace:*",
-        "@url-shortener/shared": "workspace:*",
         "better-auth": "^1.6.9",
         "drizzle-orm": "^0.44",
         "hono": "^4",
         "nanoid": "^5.1.11",
         "zod": "^4.4.2",
       },
-    },
-    "packages/shared": {
-      "name": "@url-shortener/shared",
-      "version": "0.0.0",
     },
   },
   "packages": {
@@ -470,8 +465,6 @@
     "@url-shortener/e2e": ["@url-shortener/e2e@workspace:packages/e2e"],
 
     "@url-shortener/server": ["@url-shortener/server@workspace:packages/server"],
-
-    "@url-shortener/shared": ["@url-shortener/shared@workspace:packages/shared"],
 
     "@vitejs/plugin-react": ["@vitejs/plugin-react@6.0.1", "", { "dependencies": { "@rolldown/pluginutils": "1.0.0-rc.7" }, "peerDependencies": { "@rolldown/plugin-babel": "^0.1.7 || ^0.2.0", "babel-plugin-react-compiler": "^1.0.0", "vite": "^8.0.0" }, "optionalPeers": ["@rolldown/plugin-babel", "babel-plugin-react-compiler"] }, "sha512-l9X/E3cDb+xY3SWzlG1MOGt2usfEHGMNIaegaUGFsLkb3RCn/k8/TOXBcab+OndDI4TBtktT8/9BwwW8Vi9KUQ=="],
 

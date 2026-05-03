@@ -3,9 +3,8 @@ Bun workspace monorepo. All tooling runs from the root.
 ## Architecture
 
 - Bun workspaces with `packages/*`
-- Packages: `@url-shortener/shared`, `@url-shortener/server` (Hono), `@url-shortener/database` (Drizzle + Postgres)
-- Cross-package imports: `import { x } from "@url-shortener/shared"` via `workspace:*`
-- Shared package exports raw `.ts` — no build step
+- Packages: `@url-shortener/server` (Hono), `@url-shortener/database` (Drizzle + Postgres), `@url-shortener/app` (React + Vite), `@url-shortener/e2e` (Playwright)
+- Cross-package imports use `workspace:*`; packages export raw `.ts` — no build step
 - Dev tooling at root: TypeScript, ESLint, Prettier, Husky
 
 ## Commands

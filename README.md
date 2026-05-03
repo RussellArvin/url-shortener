@@ -1,16 +1,19 @@
 # URL Shortener
 
-A self-hostable URL shortener with email/password auth, soft-delete, Redis-cached redirects, and a typed end-to-end stack — built on Bun.
+A URL shortening service in the spirit of bit.ly. Submit a long URL, get a short one back; visit the short one, get redirected.
 
-## Features
+**Live demo:** https://url-shortener-production-1691.up.railway.app
 
-- **Auth** — email + password sign-up via [better-auth], session cookies, per-user link ownership
-- **Slugs** — random 7-char (nanoid, base36) or custom 1–30 chars (`a-z 0-9 _ -`)
-- **Reserved slugs** — `api`, `links`, `assets` blocked at validation so they never collide with app routes
-- **Soft delete** — `deleted_at` column, deleted slugs return 404
-- **Cached redirects** — cache-aside on Redis with 7-day TTL, populated on create and on cache miss
-- **Type-safe client** — frontend imports server route types via Hono RPC; no manual API types
-- **Theme switching** — light/dark with the View Transitions API animation
+## What it does
+
+- **Shorten** — POST a URL to `/api/links`, get back a slug (random 7 chars, or your own custom slug 1–30 chars from `a-z 0-9 _ -`)
+- **Redirect** — `GET /:slug` → 302 to the original URL
+- **Manage** — sign in to see your links, copy them, delete them
+- **Persist** — links live in PostgreSQL; soft-deleted slugs return 404 but can be restored from the database
+- **Cached redirects** — Redis cache-aside with 7-day TTL keeps hot links off the database
+- **Responsive UI** — Tailwind + shadcn, light/dark theme with the View Transitions API
+- **Reserved paths** — slugs that would collide with the app (`api`, `links`, `assets`, `health`) are blocked at validation
+- **Type-safe end-to-end** — the frontend imports server route types via Hono RPC, so request/response shapes can't drift
 
 ## Tech stack
 
@@ -33,7 +36,6 @@ packages/
   app/        React + Vite frontend
   server/     Hono API + /:slug redirect — also serves the built SPA in prod
   database/   Drizzle schema + migrations
-  shared/     Cross-package utilities
   e2e/        Playwright happy-path tests
 ```
 
@@ -81,7 +83,7 @@ bun run dev
 | --------------------------------- | ------------------------------------------------ |
 | `bun run dev`                     | Start server + frontend                          |
 | `bun run build`                   | Vite-build the frontend into `packages/app/dist` |
-| `bun run test`                    | Integration tests (server + shared)              |
+| `bun run test`                    | Integration tests (server)                       |
 | `bun run test:e2e`                | Playwright happy path                            |
 | `bun run typecheck`               | `tsc --noEmit` across packages                   |
 | `bun run lint` / `lint:fix`       | ESLint                                           |
