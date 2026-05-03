@@ -40,8 +40,13 @@ export const linksRoutes = new Hono<AppEnv>()
         201,
       );
     } catch (err) {
-      // 23505 = Postgres unique_violation
-      if ((err as { code?: string }).code === "23505") {
+      // 23505 = Postgres unique_violation. Drizzle wraps the driver error,
+      // so the pg errno lives on err.cause.errno (Bun sql) or err.code.
+      const cause = (err as { cause?: unknown }).cause;
+      const errno =
+        (cause as { errno?: string } | null | undefined)?.errno ??
+        (err as { code?: string }).code;
+      if (errno === "23505") {
         return c.json({ error: "Slug already taken" }, 409);
       }
       throw err;

@@ -14,9 +14,12 @@
     "typecheck": "bunx tsc --noEmit && bun run --filter '@url-shortener/app' typecheck",
     "drizzle:generate": "bun run --filter '@url-shortener/database' drizzle:generate",
     "drizzle:migrate": "bun run --filter '@url-shortener/database' drizzle:migrate",
+    "drizzle:migrate:test": "DATABASE_URL=postgresql://user:pass@localhost:5432/url_shortener_test bun run --filter '@url-shortener/database' drizzle:migrate",
     "drizzle:push": "bun run --filter '@url-shortener/database' drizzle:push",
     "drizzle:studio": "bun run --filter '@url-shortener/database' drizzle:studio",
-    "test": "bun test",
+    "db:seed": "bun run --filter '@url-shortener/server' seed",
+    "test": "bun test packages/server packages/shared",
+    "test:e2e": "bun run --filter '@url-shortener/e2e' test",
     "prepare": "husky"
   },
   "devDependencies": {

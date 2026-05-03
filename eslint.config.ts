@@ -47,6 +47,8 @@ export default tseslint.config(
       "packages/*/dist/",
       // shadcn / vendored UI primitives — not our code
       "packages/app/src/components/ui/",
+      // playwright e2e — runs in its own runtime, has its own test runner
+      "packages/e2e/",
     ],
   },
 );
