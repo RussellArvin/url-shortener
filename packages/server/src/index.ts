@@ -1,15 +1,11 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { auth } from "./lib/auth";
+import type { AppEnv } from "./lib/context";
+import { linksRoutes } from "./routes/links";
+import { redirectRoutes } from "./routes/redirect";
 
-type AuthSession = typeof auth.$Infer.Session;
-
-interface Variables {
-  user: AuthSession["user"] | null;
-  session: AuthSession["session"] | null;
-}
-
-const app = new Hono<{ Variables: Variables }>();
+const app = new Hono<AppEnv>();
 
 app.use(
   "/api/*",
@@ -38,6 +34,11 @@ app.get("/api/me", (c) => {
   if (!user) return c.json({ error: "Unauthorized" }, 401);
   return c.json({ user });
 });
+
+app.route("/api/links", linksRoutes);
+
+// Public redirect — must be registered last so /:slug doesn't shadow other routes
+app.route("/", redirectRoutes);
 
 export { app };
 
