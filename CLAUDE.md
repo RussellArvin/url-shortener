@@ -3,7 +3,7 @@ Bun workspace monorepo. All tooling runs from the root.
 ## Architecture
 
 - Bun workspaces with `packages/*`
-- Packages: `@url-shortener/shared`, `@url-shortener/app` (Hono), `@url-shortener/database` (Drizzle + Postgres)
+- Packages: `@url-shortener/shared`, `@url-shortener/server` (Hono), `@url-shortener/database` (Drizzle + Postgres)
 - Cross-package imports: `import { x } from "@url-shortener/shared"` via `workspace:*`
 - Shared package exports raw `.ts` — no build step
 - Dev tooling at root: TypeScript, ESLint, Prettier, Husky
@@ -13,7 +13,7 @@ Bun workspace monorepo. All tooling runs from the root.
 - `bun install` — install all workspace dependencies
 - `bun run dev` — start all packages in dev mode
 - `bun test` — run all tests
-- `bun test packages/app/` — run tests for a specific package
+- `bun test packages/server/` — run tests for a specific package
 - `bun run typecheck` — `tsc --noEmit` across all packages
 - `bun run lint` / `bun run lint:fix` — ESLint
 - `bun run format` / `bun run format:check` — Prettier
@@ -74,7 +74,7 @@ Fix before committing: `bun run lint:fix && bun run format`
 
 ## Adding Routes (app package)
 
-Routes go in `packages/app/src/index.ts` using Hono:
+Routes go in `packages/server/src/index.ts` using Hono:
 
 ```ts
 app.get("/path/:param", (c) => {

@@ -18,7 +18,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["packages/app/**/*.ts"],
+    files: ["packages/server/**/*.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",

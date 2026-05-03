@@ -17,14 +17,6 @@
         "typescript-eslint": "^8.58.1",
       },
     },
-    "packages/app": {
-      "name": "@url-shortener/app",
-      "version": "0.0.0",
-      "dependencies": {
-        "@url-shortener/shared": "workspace:*",
-        "hono": "^4",
-      },
-    },
     "packages/database": {
       "name": "@url-shortener/database",
       "version": "0.0.0",
@@ -33,6 +25,14 @@
       },
       "devDependencies": {
         "drizzle-kit": "^0.31",
+      },
+    },
+    "packages/server": {
+      "name": "@url-shortener/server",
+      "version": "0.0.0",
+      "dependencies": {
+        "@url-shortener/shared": "workspace:*",
+        "hono": "^4",
       },
     },
     "packages/shared": {
@@ -155,9 +155,9 @@
 
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.58.1", "", { "dependencies": { "@typescript-eslint/types": "8.58.1", "eslint-visitor-keys": "^5.0.0" } }, "sha512-y+vH7QE8ycjoa0bWciFg7OpFcipUuem1ujhrdLtq1gByKwfbC7bPeKsiny9e0urg93DqwGcHey+bGRKCnF1nZQ=="],
 
-    "@url-shortener/app": ["@url-shortener/app@workspace:packages/app"],
-
     "@url-shortener/database": ["@url-shortener/database@workspace:packages/database"],
+
+    "@url-shortener/server": ["@url-shortener/server@workspace:packages/server"],
 
     "@url-shortener/shared": ["@url-shortener/shared@workspace:packages/shared"],
 

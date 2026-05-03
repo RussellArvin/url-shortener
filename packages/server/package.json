@@ -1,5 +1,5 @@
 {
-  "name": "@url-shortener/app",
+  "name": "@url-shortener/server",
   "version": "0.0.0",
   "private": true,
   "type": "module",

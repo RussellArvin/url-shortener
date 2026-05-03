@@ -14,7 +14,7 @@ bun run dev
 ```
 packages/
   shared/     @url-shortener/shared    — shared types and utilities
-  app/        @url-shortener/app       — Hono API server (port 3000)
+  server/     @url-shortener/server    — Hono API server (port 3000)
   database/   @url-shortener/database  — Drizzle ORM + PostgreSQL
 ```
 
