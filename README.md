@@ -2,7 +2,7 @@
 
 A URL shortening service in the spirit of bit.ly. Submit a long URL, get a short one back; visit the short one, get redirected.
 
-**Live demo:** https://url-shortener-production-1691.up.railway.app
+**Live demo:** https://url.russellarvin.com
 
 ## What it does
 
