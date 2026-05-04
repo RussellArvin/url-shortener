@@ -22,6 +22,13 @@
       "when": 1777837271139,
       "tag": "0002_worried_lady_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777867021467,
+      "tag": "0003_sour_starjammers",
+      "breakpoints": true
     }
   ]
 }
