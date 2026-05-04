@@ -9,6 +9,16 @@ import { cache } from "../lib/cache";
 import { requireAuth } from "../lib/middleware";
 import { generateSlug } from "../lib/slug";
 
+// 23505 = Postgres unique_violation. Drizzle wraps the driver error, so the pg
+// errno lives on err.cause.errno (Bun sql) or err.code.
+function isUniqueViolation(err: unknown): boolean {
+  const cause = (err as { cause?: unknown }).cause;
+  const errno =
+    (cause as { errno?: string } | null | undefined)?.errno ??
+    (err as { code?: string }).code;
+  return errno === "23505";
+}
+
 // Random slugs are 7 chars so can't collide with any current top-level route;
 // only custom slugs need the reserved-slug guard.
 export function makeLinksRoutes(reservedSlugs: ReadonlySet<string>) {
@@ -26,35 +36,36 @@ export function makeLinksRoutes(reservedSlugs: ReadonlySet<string>) {
     .post("/", requireAuth, zValidator("json", createLinkSchema), async (c) => {
       const user = c.get("user");
       const { targetUrl, customSlug } = c.req.valid("json");
-      const slug = customSlug ?? generateSlug();
 
-      try {
+      const tryInsert = async (slug: string) => {
         const [row] = await db
           .insert(links)
           .values({ slug, targetUrl, userId: user.id })
           .returning();
         if (!row) throw new Error("insert returned no row");
-        await cache.set(row.slug, row.targetUrl);
-        return c.json(
-          {
-            slug: row.slug,
-            targetUrl: row.targetUrl,
-            createdAt: row.createdAt,
-          },
-          201,
-        );
+        return row;
+      };
+
+      let row: Awaited<ReturnType<typeof tryInsert>>;
+      try {
+        row = await tryInsert(customSlug ?? generateSlug());
       } catch (err) {
-        // 23505 = Postgres unique_violation. Drizzle wraps the driver error,
-        // so the pg errno lives on err.cause.errno (Bun sql) or err.code.
-        const cause = (err as { cause?: unknown }).cause;
-        const errno =
-          (cause as { errno?: string } | null | undefined)?.errno ??
-          (err as { code?: string }).code;
-        if (errno === "23505") {
-          return c.json({ error: "Slug already taken" }, 409);
-        }
-        throw err;
+        if (!isUniqueViolation(err)) throw err;
+        if (customSlug) return c.json({ error: "Slug already taken" }, 409);
+        // Random-slug collision is astronomically rare at 36^7. Retry once;
+        // if the retry also collides, let it 500.
+        row = await tryInsert(generateSlug());
       }
+
+      await cache.set(row.slug, row.targetUrl);
+      return c.json(
+        {
+          slug: row.slug,
+          targetUrl: row.targetUrl,
+          createdAt: row.createdAt,
+        },
+        201,
+      );
     })
     .get("/", requireAuth, async (c) => {
       const user = c.get("user");
