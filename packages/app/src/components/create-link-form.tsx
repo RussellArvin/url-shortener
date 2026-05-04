@@ -43,9 +43,11 @@ export function CreateLinkForm({ onSubmit }: CreateLinkFormProps) {
           <FormField
             field={field}
             label="URL"
-            type="url"
+            type="text"
             required
-            placeholder="https://example.com/very/long/path"
+            pattern="(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?"
+            title="Enter a valid URL (e.g. example.com or https://example.com/path)"
+            placeholder="example.com/very/long/path"
           />
         )}
       </form.Field>

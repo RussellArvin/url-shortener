@@ -36,9 +36,12 @@ export function HomePage() {
           <CardContent>
             <CreateLinkForm
               onSubmit={async (values) => {
+                const targetUrl = /^https?:\/\//i.test(values.url)
+                  ? values.url
+                  : `https://${values.url}`;
                 try {
                   const link = await create.mutateAsync({
-                    targetUrl: values.url,
+                    targetUrl,
                     ...(values.mode === "custom"
                       ? { customSlug: values.customSlug }
                       : {}),
