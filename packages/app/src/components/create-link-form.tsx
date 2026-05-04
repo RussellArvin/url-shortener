@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/form-field";
 import { FormSubmit } from "@/components/form-submit";
+import { isValidUrl, URL_PATTERN } from "@/lib/url";
 
 type SlugMode = "random" | "custom";
 
@@ -38,14 +39,23 @@ export function CreateLinkForm({ onSubmit }: CreateLinkFormProps) {
       }}
       className="space-y-4"
     >
-      <form.Field name="url">
+      <form.Field
+        name="url"
+        validators={{
+          onChange: ({ value }) => {
+            if (!value) return "URL is required";
+            if (!isValidUrl(value)) return "Enter a valid URL";
+            return undefined;
+          },
+        }}
+      >
         {(field) => (
           <FormField
             field={field}
             label="URL"
             type="text"
             required
-            pattern="(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?"
+            pattern={URL_PATTERN}
             title="Enter a valid URL (e.g. example.com or https://example.com/path)"
             placeholder="example.com/very/long/path"
           />

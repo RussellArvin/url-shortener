@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { type Link } from "@/lib/api";
+import { normalizeUrl } from "@/lib/url";
 import { useCreateLink } from "@/hooks/useCreateLink";
 import { CreateLinkForm } from "@/components/create-link-form";
 import { PageHeading, PageShell } from "@/components/page-shell";
@@ -36,12 +37,9 @@ export function HomePage() {
           <CardContent>
             <CreateLinkForm
               onSubmit={async (values) => {
-                const targetUrl = /^https?:\/\//i.test(values.url)
-                  ? values.url
-                  : `https://${values.url}`;
                 try {
                   const link = await create.mutateAsync({
-                    targetUrl,
+                    targetUrl: normalizeUrl(values.url),
                     ...(values.mode === "custom"
                       ? { customSlug: values.customSlug }
                       : {}),
